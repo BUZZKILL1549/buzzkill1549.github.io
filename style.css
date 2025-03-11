@@ -121,6 +121,21 @@ nav {
     transition: transform 0.3s;
 }
 
+.repos-card a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.repos-card a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.repos-card a:visited {
+  color: #007bff;
+}
+
 .repos-card:hover {
     transform: translateY(-5px);
 }
