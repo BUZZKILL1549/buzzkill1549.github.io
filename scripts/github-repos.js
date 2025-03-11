@@ -27,14 +27,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Display repositories
     if (pinnedRepos.length > 0) {
       pinnedRepos.forEach(repo => {
+        // Ensure stargazers and forks objects exist
+        const stargazerCount = repo.stargazers ? repo.stargazers.totalCount : 0;
+        const forkCount = repo.forks ? repo.forks.totalCount : 0;
+
         const repoCard = document.createElement('div');
         repoCard.className = 'repos-card';
         repoCard.innerHTML = `
           <h3><a href="${repo.url}" target="_blank">${repo.name}</a></h3>
           <p>${repo.description || 'No description available'}</p>
           <div class="repo-stats">
-            <span>⭐ ${repo.stargazers ? repo.stargazers.totalCount : 0}</span>
-            <span>🍴 ${repo.forks ? repo.forks.totalCount : 0}</span>
+            <span>⭐ ${stargazerCount}</span>
+            <span>🍴 ${forkCount}</span>
           </div>
         `;
         reposSection.appendChild(repoCard);
