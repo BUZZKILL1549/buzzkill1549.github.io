@@ -2,8 +2,8 @@ name: Fetch Pinned Repositories
 
 on:
   schedule:
-    - cron: '0 * * * *'  # Runs every hour (adjust as needed)
-  workflow_dispatch:  # Allows manual trigger
+    - cron: '0 * * * *'  # Runs every hour
+  workflow_dispatch:
 
 jobs:
   fetch-repos:
@@ -11,19 +11,17 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Fetch pinned repositories
         run: |
-          curl -X POST -H "Authorization: bearer ${{ secrets.TOKEN_GITHUB }}" \
-          -H "Content-Type: application/json" \
-          -d '{"query": "query { user(login: \"BUZZKILL1549\") { pinnedItems(first: 6, types: REPOSITORY) { nodes { ... on Repository { name description url stargazers { totalCount } forks { totalCount } } } } } }"}' \
-          https://api.github.com/graphql | jq '.data.user.pinnedItems.nodes' > pinned_repos.json
+          curl -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" \
+               -H "Content-Type: application/json" \
+               -X POST -d '{ "query": "{ user(login: \"BUZZKILL1549\") { pinnedItems(first: 6, types: REPOSITORY) { nodes { ... on Repository { name description url stargazerCount forkCount } } } } }" }' \
+               https://api.github.com/graphql > pinned_repos.json
 
-      - name: Commit and push changes
+      - name: Commit and push if changed
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add pinned_repos.json
-          git commit -m "Update pinned repositories" || echo "No changes to commit"
-          git push
+          git commit -m "Updated pinned repositories" || exit 0
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
