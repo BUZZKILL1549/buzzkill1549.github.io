@@ -33,8 +33,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           <h3><a href="${repo.url}" target="_blank">${repo.name}</a></h3>
           <p>${repo.description || 'No description available'}</p>
           <div class="repo-stats">
-            <span>⭐ ${repo.stargazers.totalCount}</span>
-            <span>🍴 ${repo.forks.totalCount}</span>
+            <span>⭐ ${repo.stargazers ? repo.stargazers.totalCount : 0}</span>
+            <span>🍴 ${repo.forks ? repo.forks.totalCount : 0}</span>
           </div>
         `;
         reposSection.appendChild(repoCard);
