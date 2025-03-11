@@ -27,9 +27,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Display repositories
     if (pinnedRepos.length > 0) {
       pinnedRepos.forEach(repo => {
-        // Ensure stargazers and forks objects exist
-        const stargazerCount = repo.stargazers ? repo.stargazers.totalCount : 0;
-        const forkCount = repo.forks ? repo.forks.totalCount : 0;
+        const stargazerCount = repo.stargazerCount !== undefined ? repo.stargazerCount : 0;
+        const forkCount = repo.forkCount !== undefined ? repo.forkCount : 0;
 
         const repoCard = document.createElement('div');
         repoCard.className = 'repos-card';
