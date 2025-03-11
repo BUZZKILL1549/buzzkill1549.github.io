@@ -1,0 +1,29 @@
+name: Fetch Pinned Repositories
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Runs every hour (adjust as needed)
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  fetch-repos:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Fetch pinned repositories
+        run: |
+          curl -X POST -H "Authorization: bearer ${{ secrets.TOKEN_GITHUB }}" \
+          -H "Content-Type: application/json" \
+          -d '{"query": "query { user(login: \"BUZZKILL1549\") { pinnedItems(first: 6, types: REPOSITORY) { nodes { ... on Repository { name description url stargazers { totalCount } forks { totalCount } } } } } }"}' \
+          https://api.github.com/graphql | jq '.data.user.pinnedItems.nodes' > pinned_repos.json
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add pinned_repos.json
+          git commit -m "Update pinned repositories" || echo "No changes to commit"
+          git push
