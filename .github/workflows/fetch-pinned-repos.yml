@@ -15,13 +15,16 @@ jobs:
 
       - name: Fetch pinned repositories
         run: |
-          curl -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" \
+          curl -H "Authorization: Bearer ${{ secrets.TOKEN_PAT }}" \
                -H "Content-Type: application/json" \
-               -X POST -d '{ "query": "{ user(login: \"BUZZKILL1549\") { pinnedItems(first: 6, types: REPOSITORY) { nodes { ... on Repository { name description url stargazerCount forkCount } } } } }" }' \
+               -X POST -d '{ "query": "{ user(login: \"BUZZKILL1549\") { pinnedItems(first: 6, types: REPOSITORY) { nodes { name description url stargazerCount forkCount } } } }" }' \
                https://api.github.com/graphql > pinned_repos.json
+
+      - name: Show file content (debugging)
+        run: cat pinned_repos.json
 
       - name: Commit and push if changed
         run: |
           git add pinned_repos.json
           git commit -m "Updated pinned repositories" || exit 0
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+          git push https://x-access-token:${{ secrets.TOKEN_PAT }}@github.com/${{ github.repository }}.git HEAD:main

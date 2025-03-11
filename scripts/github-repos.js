@@ -1,38 +1,49 @@
-async function fetchPinnedRepos() {
+document.addEventListener('DOMContentLoaded', async () => {
   const reposSection = document.querySelector('.repos-grid');
 
   try {
-    // Fetch the JSON file from your GitHub repository
-    const response = await fetch('https://raw.githubusercontent.com/BUZZKILL1549/buzzkill1549.github.io/main/pinned_repos.json');
+    // Show loading message
+    reposSection.innerHTML = '<div class="loading">Loading repositories...</div>';
 
+    // Fetch pinned repositories JSON file
+    const response = await fetch('pinned_repos.json');
+    
     if (!response.ok) {
-      throw new Error(`Failed to fetch repositories: ${response.status}`);
+      throw new Error(`Error fetching JSON: ${response.statusText}`);
     }
 
-    const repos = await response.json();
-    
-    // Clear existing content
+    const data = await response.json();
+
+    // Check if the response contains the correct structure
+    if (!data || !data.data || !data.data.user || !data.data.user.pinnedItems) {
+      throw new Error("Invalid JSON format");
+    }
+
+    const pinnedRepos = data.data.user.pinnedItems.nodes;
+
+    // Clear loading message
     reposSection.innerHTML = '';
 
-    // Create repository cards
-    repos.forEach(repo => {
-      const repoCard = document.createElement('div');
-      repoCard.className = 'repos-card';
-      repoCard.innerHTML = `
-        <h3><a href="${repo.url}" target="_blank">${repo.name}</a></h3>
-        <p>${repo.description || 'No description available'}</p>
-        <div class="repo-stats">
-          <span>⭐ ${repo.stargazers.totalCount}</span>
-          <span>🍴 ${repo.forks.totalCount}</span>
-        </div>
-      `;
-      reposSection.appendChild(repoCard);
-    });
+    // Display repositories
+    if (pinnedRepos.length > 0) {
+      pinnedRepos.forEach(repo => {
+        const repoCard = document.createElement('div');
+        repoCard.className = 'repos-card';
+        repoCard.innerHTML = `
+          <h3><a href="${repo.url}" target="_blank">${repo.name}</a></h3>
+          <p>${repo.description || 'No description available'}</p>
+          <div class="repo-stats">
+            <span>⭐ ${repo.stargazerCount}</span>
+            <span>🍴 ${repo.forkCount}</span>
+          </div>
+        `;
+        reposSection.appendChild(repoCard);
+      });
+    } else {
+      reposSection.innerHTML = '<p>No pinned repositories found.</p>';
+    }
   } catch (error) {
-    console.error('Error fetching repositories:', error);
+    console.error('Error loading repositories:', error);
     reposSection.innerHTML = `<p>Error loading repositories: ${error.message}</p>`;
   }
-}
-
-// Load the repositories when the page loads
-document.addEventListener('DOMContentLoaded', fetchPinnedRepos);
+});
