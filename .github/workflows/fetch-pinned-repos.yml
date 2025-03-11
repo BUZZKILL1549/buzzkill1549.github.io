@@ -17,7 +17,7 @@ jobs:
         run: |
           curl -H "Authorization: Bearer ${{ secrets.TOKEN_PAT }}" \
                -H "Content-Type: application/json" \
-               -X POST -d '{ "query": "{ user(login: \"BUZZKILL1549\") { pinnedItems(first: 6, types: REPOSITORY) { nodes { name description url stargazerCount forkCount } } } }" }' \
+               -X POST -d '{ "query": "{ user(login: \"BUZZKILL1549\") { pinnedItems(first: 6, types: REPOSITORY) { nodes { ... on Repository { name description url stargazerCount forkCount } } } } }" }' \
                https://api.github.com/graphql > pinned_repos.json
 
       - name: Show file content (debugging)
